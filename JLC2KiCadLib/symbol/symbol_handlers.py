@@ -160,7 +160,16 @@ def h_P(data, translation, kicad_symbol):
         "VCC": "power_in",
         "VDD": "power_in",
         "VIN": "power_in",
+        "3V3": "power_in",
         "IO": "bidirectional",
+        "EN": "input",
+        "NC": "no_connect",
+        "VOUT": "power_out",
+        "OUT": "output",
+        "TX": "output",
+        "RX": "input",
+        "SCL": "unspecified",
+        "SDA": "bidirectional",
     }
 
     if electrical_type in ["passive", "unspecified"]:
