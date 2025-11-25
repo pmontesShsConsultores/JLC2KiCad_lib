@@ -79,7 +79,7 @@ def h_P(data, translation, kicad_symbol):
         data.insert(1, "0")
 
     if data[1] == "0":
-        electrical_type = "unspecified"
+        electrical_type = "passive"
     elif data[1] == "1":
         electrical_type = "input"
     elif data[1] == "2":
@@ -93,6 +93,19 @@ def h_P(data, translation, kicad_symbol):
 
     pinNumber = data[2]
     pinName = data[13]
+
+    pinTypeMap = {
+        "GND": "power_in",
+        "VCC": "power_in",
+        "VDD": "power_in",
+        "VIN": "power_in",
+        "IO": "bidirectional",
+    }
+
+    if electrical_type in ["passive", "unspecified"]:
+        for tag, eType in pinTypeMap.items():
+            if tag in pinName.upper():
+                electrical_type = eType
 
     X = round(mil2mm(float(data[3]) - translation[0]), 3)
     Y = round(-mil2mm(float(data[4]) - translation[1]), 3)
