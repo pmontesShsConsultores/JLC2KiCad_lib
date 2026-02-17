@@ -149,7 +149,7 @@ def h_P(data, translation, kicad_symbol):
         "4": "power_in",
     }
     electrical_type = eTypeMap.get(data[1], "unspecified")
-    
+
     pinNumber = data[2]
     pinName = data[13]
 
@@ -173,7 +173,7 @@ def h_P(data, translation, kicad_symbol):
     }
 
     if electrical_type in ["passive", "unspecified"]:
-        pinNameUpper = pinName.upper():
+        pinNameUpper = pinName.upper()
         for tag, eType in pinTypeMap.items():
             if tag in pinNameUpper:
                 electrical_type = eType
