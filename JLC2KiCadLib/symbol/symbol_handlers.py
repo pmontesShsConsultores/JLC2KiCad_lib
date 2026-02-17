@@ -128,19 +128,6 @@ def h_P(data, translation, kicad_symbol):
     elif len(data) == 28:
         data.insert(1, "0")
 
-    if data[1] == "0":
-        electrical_type = "passive"
-    elif data[1] == "1":
-        electrical_type = "input"
-    elif data[1] == "2":
-        electrical_type = "output"
-    elif data[1] == "3":
-        electrical_type = "bidirectional"
-    elif data[1] == "4":
-        electrical_type = "power_in"
-    else:
-        electrical_type = "unspecified"
-
     eTypeMap = {
         "0": "passive",
         "1": "input",
@@ -150,8 +137,8 @@ def h_P(data, translation, kicad_symbol):
     }
     electrical_type = eTypeMap.get(data[1], "unspecified")
 
-    pinNumber = data[2]
-    pinName = data[13]
+    pin_number = data[2]
+    pin_name = data[13]
 
     x1 = round(mil2mm(float(data[3]) - translation[0]), 3)
     y1 = round(-mil2mm(float(data[4]) - translation[1]), 3)
@@ -173,9 +160,9 @@ def h_P(data, translation, kicad_symbol):
     }
 
     if electrical_type in ["passive", "unspecified"]:
-        pinNameUpper = pinName.upper()
+        pin_nameUpper = pin_name.upper()
         for tag, eType in pinTypeMap.items():
-            if tag in pinNameUpper:
+            if tag in pin_nameUpper:
                 electrical_type = eType
                 break
 
