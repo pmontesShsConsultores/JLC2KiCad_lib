@@ -122,12 +122,6 @@ def h_P(data, translation, kicad_symbol):
     25 :
     ]
     """
-
-    if len(data) == 24:  # sometimes, the rotation parameter is not in the list.
-        data.insert(5, "0")
-    elif len(data) == 28:
-        data.insert(1, "0")
-
     eTypeMap = {
         "0": "passive",
         "1": "input",
@@ -142,6 +136,7 @@ def h_P(data, translation, kicad_symbol):
 
     x1 = round(mil2mm(float(data[3]) - translation[0]), 3)
     y1 = round(-mil2mm(float(data[4]) - translation[1]), 3)
+
     pinTypeMap = {
         "GND": "power_in",
         "VCC": "power_in",
@@ -165,9 +160,6 @@ def h_P(data, translation, kicad_symbol):
             if tag in pin_nameUpper:
                 electrical_type = eType
                 break
-
-    X = round(mil2mm(float(data[3]) - translation[0]), 3)
-    Y = round(-mil2mm(float(data[4]) - translation[1]), 3)
 
     rotation = (int(data[5]) + 180) % 360 if data[5] else 180
 
