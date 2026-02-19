@@ -43,6 +43,7 @@ def add_component(component_id, args):
             model_dir=args.model_dir,
             skip_existing=args.skip_existing,
             models=args.models,
+            jlcparts_db=args.jlcparts_db,
         )
     else:
         _, datasheet_link, _, _ = get_footprint_info(footprint_component_uuid)
@@ -60,6 +61,7 @@ def add_component(component_id, args):
             output_dir=args.output_dir,
             component_id=component_id,
             skip_existing=args.skip_existing,
+            jlcparts_db=args.jlcparts_db,
         )
 
 
@@ -176,6 +178,18 @@ def main():
             "Use -model_base_variable if you want to specify the base path of the 3D "
             "model using a path variable. If the specified variable starts with '$' it "
             "is used 'as-is', otherwise it is encapsulated: $(MODEL_BASE_VARIABLE)"
+        ),
+    )
+
+    parser.add_argument(
+        "--jlcparts_db",
+        dest="jlcparts_db",
+        type=str,
+        default="",
+        help=(
+            "Use --jlcparts_db to specify path to a sqlite3 database with JLCPCB "
+            "parts (download from CDFER's https://github.com/CDFER/jlcpcb-parts-database) "
+            "and attempt to load parameters from it"
         ),
     )
 

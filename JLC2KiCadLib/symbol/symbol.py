@@ -4,6 +4,8 @@ import os
 import re
 
 import requests
+from jlcparts.datatables import extractComponent
+from jlcparts.partLib import PartLibraryDb
 
 from .. import helper
 from .symbol_handlers import handlers
@@ -29,8 +31,9 @@ def create_symbol(
     library_name,
     symbol_path,
     output_dir,
-    component_id,
+    component_id: str,
     skip_existing,
+    jlcparts_db: str,
 ):
     class kicad_symbol:
         drawing = ""
@@ -88,6 +91,20 @@ def create_symbol(
             and component_uuid == symbol_component_uuid[0]
         ):
             continue
+
+        if len(jlcparts_db) > 0:
+            pLib = PartLibraryDb(filepath=jlcparts_db)
+            component = pLib.getComponent(component_id)
+            schema = {
+                "attributes": 1,
+                "datasheet": 2,
+                "price": 3,
+                "description": 4,
+            }
+            properties = extractComponent(
+                component,
+                tuple(schema.keys())
+            )
 
         # if library_name is not defined, use component_title as library name
         if not library_name:

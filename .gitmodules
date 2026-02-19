@@ -1,0 +1,6 @@
+[submodule "jlcparts"]
+	path = jlcparts-repo
+	url = https://github.com/yaqwsx/jlcparts.git
+[submodule "jlcpcb-parts-database"]
+	path = jlcpcb-parts-database
+	url = https://github.com/CDFER/jlcpcb-parts-database.git

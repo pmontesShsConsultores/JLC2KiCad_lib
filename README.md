@@ -121,6 +121,22 @@ JLC2KiCadLib relies on the [KicadModTree](https://gitlab.com/kicad/libraries/kic
 * Even so I tested the script on a lot of components, be careful and always check the output footprint and symbol.
 * I consider this project completed. I will continue to maintain it if a bug report is filed, but I will not develop new functionality in the near future. If you feel that an important feature is missing, please open an issue to discuss it, then you can fork this project with a new branch before submitting a PR. 
 
+## About this fork
+
+This fork makes use of CDFER's [jlcpcb-parts-database](https://github.com/CDFER/jlcpcb-parts-database) to load JLCPCB parameters from a previously downloaded sqlite3 database. Then it uses yaqwsx's [jlcparts](https://github.com/yaqwsx/jlcparts) to process "extra" parameters and provide additional parameters (manufacturer, description, voltage rating, current rating, etc.) on Kicad symbols.
+
+```
+git submodule update --init
+wget https://cdfer.github.io/jlcpcb-parts-database/jlcpcb-components.sqlite
+touch ./jlcparts-repo/jlcparts/__init__.py
+pip3 install ./jlcparts-repo
+```
+then use the `--jlcparts_db` option to specify the path to the sqlite3 database
+ 
+```
+JLC2KiCadLib C1337258 C24112 -dir My_lib --jlcparts_db jlcpcb-components.sqlite
+```
+
 ## License 
 
 Copyright © 2021 TousstNicolas 

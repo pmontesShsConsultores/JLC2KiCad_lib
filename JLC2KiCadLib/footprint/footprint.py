@@ -34,6 +34,7 @@ def create_footprint(
     model_dir,
     skip_existing,
     models,
+    jlcparts_db: str,
 ):
     logging.info("Creating footprint ...")
 

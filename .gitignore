@@ -1,3 +1,10 @@
+# JLC Database
+*.sqlite3*
+
+# Editor settings
+.vscode
+.zed
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
