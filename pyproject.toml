@@ -7,7 +7,7 @@ requires-python = ">=3.8"
 dependencies = [
     "KicadModTree",
     "requests",
-    "jlcparts"
+    # "jlcparts",
 ]
 authors = [
   {name = "TousstNicolas"}

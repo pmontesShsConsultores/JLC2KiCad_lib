@@ -23,11 +23,49 @@ supported_value_types = [
     "Frequency",
 ]  # define which attribute/value from JLCPCB/LCSC will be added in the "value" field
 
+def load_jlcparts_metadata(jlcparts_db: str, component_id: str) -> dict[str, str]:
+
+    props: dict[str, str] = {}
+    pLib = PartLibraryDb(filepath=jlcparts_db)
+
+    if pLib.exists(component_id):
+        component = pLib.getComponent(component_id)
+        schema = (
+            "attributes", "datasheet", "price", "description"
+        )
+        properties = extractComponent(
+            component,
+            schema,
+        )
+
+        for i, schemaItem in enumerate(schema):
+            props[schemaItem] = properties[i]
+        props["manufacturer"] = props.get("manufacturer") or component.get("manufacturer", "") # Override JLCParts "None" in manufacturer
+        if props.get("description", "") == "":
+            props["description"] = component.get("extra", {}).get("description", "")
+        target_qty = 100
+        price = ""
+        if isinstance(props.get("price"), list) and all(isinstance(p, dict) for p in props["price"]):
+            price = next(
+                (
+                    p.get("price", "")
+                    for p in props["price"]
+                    if target_qty >= p.get("qFrom", 1e5)
+                    and (not p.get("qTo", True) or target_qty <= p.get("qTo", -1))
+                ),
+            "")
+
+        if price != "":
+            logging.info(f"Price {component_id:>10} [x{target_qty}]: ${price:>10} p.u.")
+    else:
+        logging.info(f"Component {component_id} not found in {jlcparts_db}")
+
+    return props
 
 def create_symbol(
     symbol_component_uuid,
     footprint_name,
-    datasheet_link,
+    datasheet_link: str,
     library_name,
     symbol_path,
     output_dir,
@@ -35,6 +73,10 @@ def create_symbol(
     skip_existing,
     jlcparts_db: str,
 ):
+    """
+    If `jlcparts_db` is given and datasheet from JLCParts is available,
+    override `datasheet_link`
+    """
     class kicad_symbol:
         drawing = ""
         pinNamesHide = "(pin_names hide)"
@@ -92,19 +134,13 @@ def create_symbol(
         ):
             continue
 
-        if len(jlcparts_db) > 0:
-            pLib = PartLibraryDb(filepath=jlcparts_db)
-            component = pLib.getComponent(component_id)
-            schema = {
-                "attributes": 1,
-                "datasheet": 2,
-                "price": 3,
-                "description": 4,
-            }
-            properties = extractComponent(
-                component,
-                tuple(schema.keys())
-            )
+        props: dict[str, str] = {}
+        if os.path.isfile(jlcparts_db):
+            props = load_jlcparts_metadata(jlcparts_db, component_id)
+
+        datasheet_link = props.get("datasheet", datasheet_link)
+        description = props.get("description", "")
+        manufacturer = props.get("manufacturer", "")
 
         # if library_name is not defined, use component_title as library name
         if not library_name:
@@ -155,6 +191,12 @@ def create_symbol(
       (effects (font (size 1.27 1.27)) hide)
     )
     {get_type_values_properties(6, component_types_values)}{kicad_symbol.drawing}
+    (property "Description" "{description}" (id 7) (at 10.16 0 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property "Manufacturer" "{manufacturer}" (id 8) (at 10.16 0 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
   )
 """
     # ruff: enable [E501]
