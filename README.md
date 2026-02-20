@@ -138,7 +138,8 @@ pip3 install -e .
 ```
 then use the `--jlcparts_db` option to specify the path to the sqlite3 database.
 
-This could be extended to also include voltage ratings, RoHS.
+This could be extended to also include voltage ratings. Currently overwrites EasyEDA's Datasheet link.
+It displays database price, stock, RoHS. It overrides EasyEDA's value if able.
  
 ```
 JLC2KiCadLib C1337258 C24112 -dir My_lib --jlcparts_db jlcpcb-components.sqlite

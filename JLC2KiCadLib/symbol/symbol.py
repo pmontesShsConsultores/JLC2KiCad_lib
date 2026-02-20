@@ -42,8 +42,23 @@ def load_jlcparts_metadata(jlcparts_db: str, component_id: str) -> dict[str, str
         for i, schemaItem in enumerate(schema):
             props[schemaItem] = properties[i]
         props["manufacturer"] = props.get("manufacturer") or component.get("manufacturer", "") # Override JLCParts None
+        props["mfr"] = component.get("mfr", "")
         if props.get("description", "") == "":
             props["description"] = component.get("extra", {}).get("description", "")
+        # component's attributes includes the value with non standard units, properties standardizes them
+        use_standard_units = False
+        for value_type in supported_value_types:
+            if value_type in props.get("attributes", []):
+                if use_standard_units:
+                    props["value"] = (
+                        str(props["attributes"][value_type].get("values", {}).get(value_type.lower(), [""])[0])
+                        .rstrip('0').rstrip('.')
+                    )
+                else:
+                    props["value"] = (
+                        component.get("extra", {}).get("attributes", {}).get(value_type, "")
+                    )
+
         target_qty = 100
         price = ""
         if isinstance(props.get("price"), list) and all(isinstance(p, dict) for p in props["price"]):
@@ -61,7 +76,7 @@ def load_jlcparts_metadata(jlcparts_db: str, component_id: str) -> dict[str, str
             last_on_stock = 0
         dt = datetime.fromtimestamp(last_on_stock)
         formatted = dt.strftime("%Y-%m-%d %H:%M")
-        logging.info(
+        logging.warning(
             f"{component_id:>10}: ${price:>10} p.u.[x{target_qty}]"
             f"{'(' + component.get('category','') + '/' + component.get('subcategory',''):>20})"
             f" RoHS {component.get('extra', {}).get('rohs', '?')}"
@@ -126,7 +141,7 @@ def create_symbol(
             .replace('"', "{dblquote}")
         )
 
-        component_types_values = []
+        component_types_values: list[tuple[str, str]] = []
         for value_type in supported_value_types:
             if value_type in data["result"]["dataStr"]["head"]["c_para"]:
                 component_types_values.append(
@@ -149,9 +164,15 @@ def create_symbol(
         if os.path.isfile(jlcparts_db):
             props = load_jlcparts_metadata(jlcparts_db, component_id)
 
+        value = props.get("value", "") or ComponentName
         datasheet_link = props.get("datasheet", datasheet_link)
-        description = props.get("description", "")
-        manufacturer = props.get("manufacturer", "")
+        component_types_values.extend(
+            [
+                ("JLCDescription", props.get("description", "")),
+                ("Manufacturer", props.get("manufacturer", "")),
+                ("MFR.Part.#", props.get("mfr", "")),
+            ]
+        )
 
         # if library_name is not defined, use component_title as library name
         if not library_name:
@@ -186,7 +207,7 @@ def create_symbol(
     (property "Reference" "{symmbol_prefix}" (id 0) (at 0 1.27 0)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Value" "{ComponentName}" (id 1) (at 0 -2.54 0)
+    (property "Value" "{value}" (id 1) (at 0 -2.54 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Footprint" "{footprint_name}" (id 2) (at 0 -10.16 0)
@@ -202,12 +223,6 @@ def create_symbol(
       (effects (font (size 1.27 1.27)) hide)
     )
     {get_type_values_properties(6, component_types_values)}{kicad_symbol.drawing}
-    (property "Description" "{description}" (id 7) (at 10.16 0 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Manufacturer" "{manufacturer}" (id 8) (at 10.16 0 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
   )
 """
     # ruff: enable [E501]
