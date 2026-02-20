@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import re
+from datetime import datetime
 
 import requests
 from jlcparts.datatables import extractComponent
@@ -40,7 +41,7 @@ def load_jlcparts_metadata(jlcparts_db: str, component_id: str) -> dict[str, str
 
         for i, schemaItem in enumerate(schema):
             props[schemaItem] = properties[i]
-        props["manufacturer"] = props.get("manufacturer") or component.get("manufacturer", "") # Override JLCParts "None" in manufacturer
+        props["manufacturer"] = props.get("manufacturer") or component.get("manufacturer", "") # Override JLCParts None
         if props.get("description", "") == "":
             props["description"] = component.get("extra", {}).get("description", "")
         target_qty = 100
@@ -54,9 +55,19 @@ def load_jlcparts_metadata(jlcparts_db: str, component_id: str) -> dict[str, str
                     and (not p.get("qTo", True) or target_qty <= p.get("qTo", -1))
                 ),
             "")
-
-        if price != "":
-            logging.info(f"Price {component_id:>10} [x{target_qty}]: ${price:>10} p.u.")
+        try:
+            last_on_stock = int(component.get('last_on_stock', "0"))
+        except ValueError:
+            last_on_stock = 0
+        dt = datetime.fromtimestamp(last_on_stock)
+        formatted = dt.strftime("%Y-%m-%d %H:%M")
+        logging.info(
+            f"{component_id:>10}: ${price:>10} p.u.[x{target_qty}]"
+            f"{'(' + component.get('category','') + '/' + component.get('subcategory',''):>20})"
+            f" RoHS {component.get('extra', {}).get('rohs', '?')}"
+            f" Stock {component.get('stock', 'Unknown'):} ({formatted})"
+            f" {'Basic' if component.get('basic', False) else 'Extended':>8}"
+        )
     else:
         logging.info(f"Component {component_id} not found in {jlcparts_db}")
 
