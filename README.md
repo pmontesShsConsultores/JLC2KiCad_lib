@@ -130,9 +130,9 @@ git submodule update --init
 wget https://cdfer.github.io/jlcpcb-parts-database/jlcpcb-components.sqlite
 touch ./jlcparts-repo/jlcparts/__init__.py
 pip3 install ./jlcparts-repo
+pip3 install -e .
 ```
 then use the `--jlcparts_db` option to specify the path to the sqlite3 database.
-Name "`jlcparts-repo`" is used instead of plain "`jlcparts`" to prevent messing Python package names.
  
 ```
 JLC2KiCadLib C1337258 C24112 -dir My_lib --jlcparts_db jlcpcb-components.sqlite
