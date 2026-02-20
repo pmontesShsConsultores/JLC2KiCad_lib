@@ -164,7 +164,7 @@ def create_symbol(
         if os.path.isfile(jlcparts_db):
             props = load_jlcparts_metadata(jlcparts_db, component_id)
 
-        value = props.get("value", "") or ComponentName
+        value = props.get("value", "") or props.get("mfr", "") or ComponentName
         datasheet_link = props.get("datasheet", datasheet_link)
         component_types_values.extend(
             [
