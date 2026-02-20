@@ -72,7 +72,8 @@ options:
   --skip_existing       use --skip_existing if you want do not want to replace already existing footprints and symbols
   -model_base_variable MODEL_BASE_VARIABLE
                         use -model_base_variable if you want to specify the base path of the 3D model using a path variable
-  --jlcparts_db         use --jlcparts_db to specify path to a sqlite3 database with JLCPCB parts
+  --jlcparts_db DB_PATH 
+                        use --jlcparts_db to specify path to a sqlite3 database with JLCPCB parts
                         (download from CDFER's https://github.com/CDFER/jlcpcb-parts-database)
                         and attempt to load parameters from it
   -logging_level {DEBUG,INFO,WARNING,ERROR,CRITICAL}
