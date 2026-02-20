@@ -72,10 +72,13 @@ options:
   --skip_existing       use --skip_existing if you want do not want to replace already existing footprints and symbols
   -model_base_variable MODEL_BASE_VARIABLE
                         use -model_base_variable if you want to specify the base path of the 3D model using a path variable
+  --jlcparts_db         use --jlcparts_db to specify path to a sqlite3 database with JLCPCB parts
+                        (download from CDFER's https://github.com/CDFER/jlcpcb-parts-database)
+                        and attempt to load parameters from it
   -logging_level {DEBUG,INFO,WARNING,ERROR,CRITICAL}
                         set logging level. If DEBUG is used, the debug logs are only written in the log file if the option --log_file is set
   --log_file            use --log_file if you want logs to be written in a file
-  --version             Print versin number and exit
+  --version             Print version number and exit
 
 exemple use : 
         JLC2KiCadLib C1337258 C24112 -dir My_lib -symbol_lib My_Symbol_lib --no_footprint
@@ -123,7 +126,7 @@ JLC2KiCadLib relies on the [KicadModTree](https://gitlab.com/kicad/libraries/kic
 
 ## About this fork
 
-This fork makes use of CDFER's [jlcpcb-parts-database](https://github.com/CDFER/jlcpcb-parts-database) to load JLCPCB parameters from a previously downloaded sqlite3 database. Then it uses yaqwsx's [jlcparts](https://github.com/yaqwsx/jlcparts) to process "extra" parameters and provide additional parameters (manufacturer, description, voltage rating, current rating, etc.) on Kicad symbols.
+This fork makes use of CDFER's [jlcpcb-parts-database](https://github.com/CDFER/jlcpcb-parts-database) to load JLCPCB parameters from a previously downloaded sqlite3 database. Then it uses yaqwsx's [jlcparts](https://github.com/yaqwsx/jlcparts) to process "extra" parameters and provide additional parameters (manufacturer, description) on Kicad symbols.
 
 ```
 git submodule update --init
@@ -133,6 +136,8 @@ pip3 install ./jlcparts-repo
 pip3 install -e .
 ```
 then use the `--jlcparts_db` option to specify the path to the sqlite3 database.
+
+This could be extended to also include voltage ratings, RoHS.
  
 ```
 JLC2KiCadLib C1337258 C24112 -dir My_lib --jlcparts_db jlcpcb-components.sqlite
